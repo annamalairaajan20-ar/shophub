@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopHub - Working</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="shophub-navbar">
+        <div class="navbar-container">
+            <button class="navbar-toggle" id="navbarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <a href="index.html" class="navbar-logo">
+                🛍️ <span>ShopHub</span>
+            </a>
+
+            <ul class="navbar-links" id="navbarLinks">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="about.html" class="navbar-link">About</a></li>
+                <li><a href="product.html" class="navbar-link">Products</a></li>
+                <li><a href="wishlist.html" class="navbar-link">❤️ Wishlist</a></li>
+                <li><a href="#" class="navbar-link logout">Logout</a></li>
+            </ul>
+
+            <a href="cart.html" class="navbar-cart">
+                🛒 <span class="cart-badge">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- SEARCH SECTION -->
+    <div class="search-section">
+        <div class="search-wrapper">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search products...">
+                <button class="search-button">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANNER -->
+    <div class="banner">
+        <div class="slides">
+            <button class="arrow arrow-left" onclick="moveSlide(-1)">&#10094;</button>
+            <img class="slide" src="online-shopping-banner-promotion-design_10763837.jpg!w700wp" alt="Banner 1"
+                style="display:block;">
+            <img class="slide" src="360_F_339606710_pFQOII8MwyEVqXK5vb4XsIaJr13cipWO.jpg" alt="Banner 2"
+                style="display:none;">
+            <img class="slide" src="super-offer-mega-sale-facebook-cover-template_316461-73.avif" alt="Banner 3"
+                style="display:none;">
+            <img class="slide" src="shopping-banner-design_10726461.jpg!w700wp" alt="Banner 4" style="display:none;">
+            <button class="arrow arrow-right" onclick="moveSlide(1)">&#10095;</button>
+        </div>
+    </div>
+
+    <div class="dots">
+        <button class="dot active" onclick="currentSlide(0)"></button>
+        <button class="dot" onclick="currentSlide(1)"></button>
+        <button class="dot" onclick="currentSlide(2)"></button>
+        <button class="dot" onclick="currentSlide(3)"></button>
+    </div>
+
+    <center>
+        <div id="productsSection">
+            <!-- LOADING SPINNER - Initially Visible -->
+            <div class="loding" id="loadingSpinner">
+                <div class="spinner-grow text-danger" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <!-- PRODUCTS - Initially Hidden -->
+            <div id="productsContainer" class="product-container" style="display: none;"></div>
+        </div>
+
+        <div id="cartSection" style="display:none;">
+            <button onclick="showProducts()">← Back to products</button>
+            <div id="cartItems"></div>
+        </div>
+    </center>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // NAVBAR TOGGLE
+        const navbarToggle = document.getElementById('navbarToggle');
+        const navbarLinks = document.getElementById('navbarLinks');
+
+        if (navbarToggle && navbarLinks) {
+            navbarToggle.addEventListener('click', () => {
+                navbarLinks.classList.toggle('active');
+                navbarToggle.classList.toggle('active');
+            });
+
+            document.querySelectorAll('.navbar-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navbarLinks.classList.remove('active');
+                    navbarToggle.classList.remove('active');
+                });
+            });
+        }
+
+        // PRODUCTS DATA
+        const products = [
+            { Name: "Watch", image: "./savvy-bucket-t500-smart-watch-1-3-full-touch-men-women-smartwatch-black-strap-freesize-product-images-orvc3uqboi7-p599130187-0-202303081021.webp", Price: 1999, Quantity: 15, cart: false, wishlist: false },
+            { Name: "Laptop", image: "./second-hand-apple-laptop-2222941756-q3g8s1h9.jpg", Price: 45999, Quantity: 5, cart: false, wishlist: true },
+            { Name: "Smartphone", image: "./iPhone_15_Pink_Pure_Back_iPhone_15_Pink_Pure_Front_2up_Screen__WWEN_cfd96ace-df87-4ab3-a96a-e8e9b13bb7b9_800x.webp", Price: 12999, Quantity: 8, cart: false, wishlist: false },
+            { Name: "Headphones", image: "./SKU-1621_0-1730988839304.webp", Price: 2999, Quantity: 20, cart: false, wishlist: true },
+            { Name: "Tablet", image: "images.jpg", Price: 18999, Quantity: 3, cart: false, wishlist: false },
+            { Name: "Watch", image: "./savvy-bucket-t500-smart-watch-1-3-full-touch-men-women-smartwatch-black-strap-freesize-product-images-orvc3uqboi7-p599130187-0-202303081021.webp", Price: 1999, Quantity: 15, cart: false, wishlist: false },
+            { Name: "Laptop", image: "./second-hand-apple-laptop-2222941756-q3g8s1h9.jpg", Price: 45999, Quantity: 5, cart: false, wishlist: true },
+            { Name: "Smartphone", image: "./iPhone_15_Pink_Pure_Back_iPhone_15_Pink_Pure_Front_2up_Screen__WWEN_cfd96ace-df87-4ab3-a96a-e8e9b13bb7b9_800x.webp", Price: 12999, Quantity: 8, cart: false, wishlist: false },
+            { Name: "Headphones", image: "./SKU-1621_0-1730988839304.webp", Price: 2999, Quantity: 20, cart: false, wishlist: true },
+            { Name: "Tablet", image: "images.jpg", Price: 18999, Quantity: 3, cart: false, wishlist: false },
+            { Name: "Laptop", image: "./second-hand-apple-laptop-2222941756-q3g8s1h9.jpg", Price: 45999, Quantity: 5, cart: false, wishlist: true },
+            { Name: "Smartphone", image: "./iPhone_15_Pink_Pure_Back_iPhone_15_Pink_Pure_Front_2up_Screen__WWEN_cfd96ace-df87-4ab3-a96a-e8e9b13bb7b9_800x.webp", Price: 12999, Quantity: 8, cart: false, wishlist: false },
+
+        ];
+
+        // Load products from localStorage if available
+        const savedProducts = localStorage.getItem('shophub_products');
+        if (savedProducts) {
+            const parsed = JSON.parse(savedProducts);
+            // Update the products array with saved data
+            parsed.forEach((saved, i) => {
+                if (products[i]) {
+                    products[i].cart = saved.cart;
+                    products[i].wishlist = saved.wishlist;
+                }
+            });
+        }
+
+        const productIcons = { 'Watch': '', 'Laptop': '', 'Smartphone': '', 'Headphones': '', 'Tablet': '' };
+
+        // ===== LOADING - 3 SECONDS =====
+        setTimeout(() => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('productsContainer').style.display = 'flex';
+            document.getElementById('productsContainer').style.flexWrap = 'wrap';
+            
+            // IMPORTANT: Save products to localStorage
+            localStorage.setItem('shophub_products', JSON.stringify(products));
+            
+            renderProducts();
+            updateCartCount();
+        }, 3000);
+
+        // HELPER FUNCTIONS
+        function getStockClass(q) {
+            if (q <= 5) return 'stock-low';
+            if (q <= 10) return 'stock-medium';
+            return 'stock-high';
+        }
+
+        function updateCartCount() {
+            const count = products.filter(p => p.cart).length;
+            const badge = document.querySelector('.cart-badge');
+            if (badge) badge.textContent = count;
+        }
+
+        function addToCartAndGo(event, index) {
+            // Set cart to true
+            products[index].cart = true;
+            
+            // IMPORTANT: Save to localStorage every time
+            localStorage.setItem('shophub_products', JSON.stringify(products));
+            
+            updateCartCount();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = '';
+
+            products.forEach((p, i) => {
+                const box = document.createElement('div');
+                box.className = 'product-box';
+                const stockClass = getStockClass(p.Quantity);
+                const icon = productIcons[p.Name] || '🏷️';
+                const img = `${p.image}`;
+
+                box.innerHTML = `
+                    <div>
+                        <img src="${img}" class="product-img" alt="${p.Name}">
+
+                        
+                       
+                        <a href="#" class="wishlist-icon ${p.wishlist ? 'active' : ''}" 
+                           onclick="toggleWishlist(${i}); return false;">
+                            ${p.wishlist ? '❤️' : '🤍'}
+                        </a>
+                    </div>
+                    <div class="product-details">
+                        <div class="text" >
+                        <div class="product-name">${icon} ${p.Name}</div>
+                        <div class="product-price">₹${p.Price.toLocaleString()}</div>
+                        </div>
+                        <div class="product-quantity">
+                            <span>Stock:</span>
+                            <span class="quantity-badge ${stockClass}">${p.Quantity} units</span>
+                        </div>
+                        <a class="cart-button ${p.cart ? 'in-cart' : 'add-to-cart'}"
+                           href="cart.html" onclick="addToCartAndGo(event, ${i})">
+                            ${p.cart ? '✓ In Cart - View Cart' : '🛒 Add to Cart'}
+                        </a>
+                        <button class="buy-now-button" onclick="buyNow(${i})">Buy Now</button>
+                    </div>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function toggleWishlist(i) {
+            products[i].wishlist = !products[i].wishlist;
+            
+            // Save to localStorage
+            localStorage.setItem('shophub_products', JSON.stringify(products));
+
+            // Wishlist specific storage
+            let wishlist = [];
+            const saved = localStorage.getItem('shophub_wishlist');
+            if (saved) {
+                wishlist = JSON.parse(saved);
+            }
+
+            if (products[i].wishlist) {
+                const exists = wishlist.find(item => item.Name === products[i].Name);
+                if (!exists) {
+                    wishlist.push(products[i]);
+                    localStorage.setItem('shophub_wishlist', JSON.stringify(wishlist));
+                }
+            } else {
+                wishlist = wishlist.filter(item => item.Name !== products[i].Name);
+                localStorage.setItem('shophub_wishlist', JSON.stringify(wishlist));
+            }
+
+            renderProducts();
+        }
+
+        function buyNow(i) {
+            alert('Buy Now: ' + products[i].Name);
+        }
+
+        function showProducts() {
+            document.getElementById('productsSection').style.display = 'block';
+            document.getElementById('cartSection').classList.remove('active');
+        }
+
+        function showCart() {
+            document.getElementById('productsSection').style.display = 'none';
+            document.getElementById('cartSection').classList.add('active');
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            const cartProducts = products.filter(p => p.cart);
+
+            if (cartProducts.length === 0) {
+                container.innerHTML = '<div class="empty-cart">Your cart is empty! 🛒</div>';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = '';
+
+            cartProducts.forEach(p => {
+                const idx = products.findIndex(pr => pr.Name === p.Name);
+                total += p.Price;
+
+                const item = document.createElement('div');
+                item.className = 'cart-item';
+                item.innerHTML = `
+                    <div class="cart-item-name">${p.Name}</div>
+                    <div class="cart-item-price">₹${p.Price.toLocaleString()}</div>
+                    <button class="remove-button" onclick="removeFromCart(${idx})">Remove</button>
+                `;
+                container.appendChild(item);
+            });
+
+            const totalDiv = document.createElement('div');
+            totalDiv.className = 'cart-total';
+            totalDiv.innerHTML = `Total: ₹${total.toLocaleString()}`;
+            container.appendChild(totalDiv);
+        }
+
+        function removeFromCart(i) {
+            products[i].cart = false;
+            // Save to localStorage
+            localStorage.setItem('shophub_products', JSON.stringify(products));
+            updateCartCount();
+            renderCart();
+            renderProducts();
+        }
+
+        // BANNER CAROUSEL
+        (function () {
+            const slides = Array.from(document.querySelectorAll('.slide'));
+            const dots = Array.from(document.querySelectorAll('.dot'));
+            let idx = 0;
+
+            function show(i) {
+                if (i < 0) i = slides.length - 1;
+                if (i >= slides.length) i = 0;
+                slides.forEach((s, j) => s.style.display = j === i ? 'block' : 'none');
+                dots.forEach((d, j) => d.classList.toggle('active', j === i));
+                idx = i;
+            }
+
+            window.moveSlide = (d) => show(idx + d);
+            window.currentSlide = (i) => show(i);
+            show(0);
+        })();
+    </script>
+</body>
+
+</html>

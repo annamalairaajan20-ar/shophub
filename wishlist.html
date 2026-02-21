@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="wishlist.css">
+    <title>ShopHub - Wishlist</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  
+</head>
+
+<body>
+    <!-- NAVBAR -->
+    <nav class="shophub-navbar">
+        <div class="navbar-container">
+            <button class="navbar-toggle" id="navbarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <a href="index.html" class="navbar-logo">
+                🛍️ <span>ShopHub</span>
+            </a>
+
+            <ul class="navbar-links" id="navbarLinks">
+                <li><a href="index.html" class="navbar-link">Home</a></li>
+                <li><a href="#" class="navbar-link">About</a></li>
+                <li><a href="#" class="navbar-link">Products</a></li>
+                <li><a href="wishlist.html" class="navbar-link">❤️ Wishlist</a></li>
+                <li><a href="#" class="navbar-link logout">Logout</a></li>
+            </ul>
+
+            <a href="cart.html" class="navbar-cart">
+                🛒 <span class="cart-badge" id="cartBadge">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- WISHLIST CONTAINER -->
+    <div class="wishlist-container">
+        <div class="wishlist-header">
+            <a href="index.html" class="back-button">← Back to Shopping</a>
+            <h1>❤️ My Wishlist</h1>
+        </div>
+
+        <div class="wishlist-content" id="wishlistContent">
+            <!-- Wishlist items will be loaded here -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // NAVBAR TOGGLE
+        const navbarToggle = document.getElementById('navbarToggle');
+        const navbarLinks = document.getElementById('navbarLinks');
+
+        if (navbarToggle && navbarLinks) {
+            navbarToggle.addEventListener('click', () => {
+                navbarLinks.classList.toggle('active');
+                navbarToggle.classList.toggle('active');
+            });
+
+            document.querySelectorAll('.navbar-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    navbarLinks.classList.remove('active');
+                    navbarToggle.classList.remove('active');
+                });
+            });
+        }
+
+        // PRODUCT ICONS
+        const productIcons = {
+            'Watch': '⌚',
+            'Laptop': '💻',
+            'Smartphone': '📱',
+            'Headphones': '🎧',
+            'Tablet': '📱'
+        };
+
+        // GET STOCK CLASS
+        function getStockClass(quantity) {
+            if (quantity <= 5) return 'stock-low';
+            if (quantity <= 10) return 'stock-medium';
+            return 'stock-high';
+        }
+
+        // UPDATE CART BADGE
+        function updateCartBadge() {
+            const products = JSON.parse(localStorage.getItem('shophub_products') || '[]');
+            const count = products.filter(p => p.cart === true).length;
+            const badge = document.getElementById('cartBadge');
+            if (badge) {
+                badge.textContent = count;
+            }
+        }
+
+        // LOAD WISHLIST ITEMS
+        function loadWishlist() {
+            const products = JSON.parse(localStorage.getItem('shophub_products') || '[]');
+            const wishlistProducts = products.filter(p => p.wishlist === true);
+
+            const wishlistContent = document.getElementById('wishlistContent');
+
+            if (wishlistProducts.length === 0) {
+                wishlistContent.innerHTML = `
+                    <div class="empty-wishlist">
+                        <div class="empty-wishlist-icon">💔</div>
+                        <h2>Your wishlist is empty!</h2>
+                        <p>Add some products you love to get started</p>
+                        <a href="index.html" class="back-button">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render wishlist items
+            let wishlistHTML = '<div class="product-container">';
+            
+            wishlistProducts.forEach((product) => {
+                const icon = productIcons[product.Name] || '🏷️';
+                const stockClass = getStockClass(product.Quantity);
+                
+                // Find original index in products array
+                const originalIndex = products.findIndex(p => 
+                    p.Name === product.Name && 
+                    p.Price === product.Price && 
+                    p.image === product.image &&
+                    p.wishlist === true
+                );
+
+                wishlistHTML += `
+                    <div class="product-box">
+                        <div class="product-image-container">
+                            <img src="${product.image}" class="product-img" alt="${product.Name}">
+                            
+                            <a href="#" class="wishlist-icon active" 
+                               onclick="toggleWishlist(${originalIndex}); return false;">
+                                ❤️
+                            </a>
+                        </div>
+                        <div class="product-details">
+                            <div class="text">
+                                <div class="product-name">${icon} ${product.Name}</div>
+                                <div class="product-price">₹${product.Price.toLocaleString()}</div>
+                            </div>
+                            <div class="product-quantity">
+                                <span>Stock:</span>
+                                <span class="quantity-badge ${stockClass}">${product.Quantity} units</span>
+                            </div>
+                            <a class="cart-button ${product.cart ? 'in-cart' : 'add-to-cart'}"
+                               href="cart.html" onclick="addToCartAndGo(event, ${originalIndex})">
+                                ${product.cart ? '✓ In Cart - View Cart' : '🛒 Add to Cart'}
+                            </a>
+                            <button class="buy-now-button" onclick="buyNow(${originalIndex})">Buy Now</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            wishlistHTML += '</div>';
+            wishlistContent.innerHTML = wishlistHTML;
+        }
+
+        // TOGGLE WISHLIST
+        function toggleWishlist(index) {
+            const products = JSON.parse(localStorage.getItem('shophub_products') || '[]');
+            
+            if (products[index]) {
+                products[index].wishlist = !products[index].wishlist;
+                localStorage.setItem('shophub_products', JSON.stringify(products));
+                loadWishlist();
+            }
+        }
+
+        // ADD TO CART
+        function addToCartAndGo(event, index) {
+            const products = JSON.parse(localStorage.getItem('shophub_products') || '[]');
+            
+            if (products[index]) {
+                products[index].cart = true;
+                localStorage.setItem('shophub_products', JSON.stringify(products));
+                updateCartBadge();
+                loadWishlist();
+            }
+        }
+
+        // BUY NOW
+        function buyNow(index) {
+            const products = JSON.parse(localStorage.getItem('shophub_products') || '[]');
+            if (products[index]) {
+                alert('Buy Now: ' + products[index].Name);
+            }
+        }
+
+        // Initialize wishlist on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadWishlist();
+            updateCartBadge();
+        });
+    </script>
+</body>
+
+</html>

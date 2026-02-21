@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Watch",
+    "Price": 1999,
+    "Quantity": 15,
+    "cart": true
+  },
+  {
+    "Name": "Laptop",
+    "Price": 45999,
+    "Quantity": 5,
+    "cart": false
+  },
+  {
+    "Name": "Smartphone",
+    "Price": 12999,
+    "Quantity": 8,
+    "cart": true
+  },
+  {
+    "Name": "Headphones",
+    "Price": 2999,
+    "Quantity": 20,
+    "cart": false
+  },
+  {
+    "Name": "Tablet",
+    "Price": 18999,
+    "Quantity": 3,
+    "cart": true
+  }
+]
