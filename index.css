@@ -405,21 +405,24 @@ body {
 .product-image-container {
   position: relative;
   width: 320px;
-  height: 240px;
+  height: 220px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  background: #f0f0f0;
 }
 
-.product-image-container img {
+.product-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 10px;
   transition: transform 0.3s ease;
 }
-p
 
-.product-box:hover .product-image-container img {
-  transform: scale(1.1);
+.product-box:hover .product-img {
+  transform: scale(1.05);
 }
 
 /* ========== WISHLIST HEART ICON CSS ========== */
@@ -797,7 +800,29 @@ p
   .product-image-container {
     height: 210px;
   }
+/* Small */
+.product-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
 
+/* Medium (current) */
+.product-img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+
+/* Full container width (fills the card image area) */
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* or contain */
+}
+.product-image-container {
+  height: 160px;   /* was 240px — reduce this to shrink the whole image area */
+}
   #cartSection {
     margin: 20px;
     padding: 25px;
